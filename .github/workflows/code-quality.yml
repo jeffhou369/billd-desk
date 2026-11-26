@@ -1,0 +1,41 @@
+name: 程式碼品質審查 (Code Quality)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: code-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: ESLint 與 Prettier 檢查
+    runs-on: ubuntu-latest
+    steps:
+      - name: 取得原始碼
+        uses: actions/checkout@v4
+
+      - name: 安裝 pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: 設定 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: 安裝相依套件
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: ESLint 靜態分析
+        run: pnpm run lint
+
+      - name: Prettier 格式檢查
+        run: pnpm exec prettier --check "src/**/*.{ts,tsx,vue,js,json,css,scss}"
+        continue-on-error: true
