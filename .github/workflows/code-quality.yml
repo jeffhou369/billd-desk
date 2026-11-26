@@ -23,6 +23,8 @@ jobs:
 
       - name: 安裝 pnpm
         uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
 
       - name: 設定 Node.js
         uses: actions/setup-node@v4
@@ -31,7 +33,9 @@ jobs:
           cache: pnpm
 
       - name: 安裝相依套件
-        run: pnpm install --frozen-lockfile --ignore-scripts
+        run: pnpm install --frozen-lockfile --ignore-scripts --dev
+        env:
+          npm_config_registry: https://registry.npmjs.org/
 
       - name: ESLint 靜態分析
         run: pnpm run lint
