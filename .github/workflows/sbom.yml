@@ -1,0 +1,30 @@
+name: Syft 軟體物料清單 (SBOM)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  sbom:
+    name: 產生 SBOM
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 取得原始碼
+        uses: actions/checkout@v4
+
+      - name: 使用 Syft 產生 SPDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: sbom.spdx.json
+          artifact-name: sbom.spdx.json
+          upload-release-assets: false
+          dependency-snapshot: ${{ github.event_name == 'push' }}
